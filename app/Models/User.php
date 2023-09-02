@@ -36,9 +36,10 @@ class User extends Authenticatable
 
     protected function roleDetail(): Attribute
     {
-        return new Attribute(
+        return Attribute::make(
             get: function () {
-                return ['1' => 'admin', '2' => 'user'][(int) $this->role];
+                $role = $this->role ?: '2';
+                return ['1' => 'admin', '2' => 'user'][$role];
             }
         );
     }
