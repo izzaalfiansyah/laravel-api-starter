@@ -34,7 +34,7 @@ class User extends Authenticatable
         'role_detail',
     ];
 
-    protected function role_detail(): Attribute
+    protected function roleDetail(): Attribute
     {
         return new Attribute(
             get: function () {
