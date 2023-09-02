@@ -58,6 +58,15 @@ class UserController extends Controller
         return $item;
     }
 
+    public function destroy($id)
+    {
+        $item = User::find($id);
+
+        $item?->delete();
+
+        return $item;
+    }
+
     public function rules($id = null)
     {
         return [
