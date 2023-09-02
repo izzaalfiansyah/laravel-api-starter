@@ -43,6 +43,21 @@ class UserController extends Controller
         return $item;
     }
 
+    public function update(Request $req, $id)
+    {
+        $data = $this->schema($req->all(), $this->rules($id));
+
+        $item = User::find($id);
+
+        if (!$req->password) {
+            unset($data['password']);
+        }
+
+        $item?->update($data);
+
+        return $item;
+    }
+
     public function rules($id = null)
     {
         return [
