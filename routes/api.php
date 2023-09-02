@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->group(function () {
     Route::resource('/user', Controllers\UserController::class);
     Route::get('/profile', [Controllers\AuthController::class, 'profile']);
+    Route::get('/logout', [Controllers\AuthController::class, 'logout']);
 });
 
 Route::post('/login', [Controllers\AuthController::class, 'login']);
