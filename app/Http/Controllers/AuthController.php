@@ -20,7 +20,7 @@ class AuthController extends Controller
 
         if ($user) {
             if (Hash::check($req->password, $user->password)) {
-                $token = $user->createToken($req->device_name)->plainTextToken;
+                $token = $user->createToken($req->device_name, $user->role != '1' ? ['access-public'] : ['*'])->plainTextToken;
                 return ['token' => $token];
             } else {
                 $this->badRequest([
