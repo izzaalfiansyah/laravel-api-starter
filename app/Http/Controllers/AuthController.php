@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Nette\Utils\Random;
 
@@ -20,11 +21,8 @@ class AuthController extends Controller
 
         if ($user) {
             if (Hash::check($req->password, $user->password)) {
-                $token = Random::generate(100);
-                $user->setRememberToken($token);
-                $user->save();
-
-                return $user->getRememberToken();
+                Auth::attempt($req->only(['email', 'password']));
+                return ['token' => Auth::user()->getRememberToken()];
             } else {
                 $this->badRequest([
                     'errors' => [
