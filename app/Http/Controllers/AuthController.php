@@ -15,14 +15,15 @@ class AuthController extends Controller
         $data = $this->schema($req->all(), [
             'email' => 'required',
             'password' => 'required',
+            'device_name' => 'required',
         ]);
 
         $user = User::where('email', $req->email)->first();
 
         if ($user) {
             if (Hash::check($req->password, $user->password)) {
-                Auth::attempt($req->only(['email', 'password']));
-                return ['token' => Auth::user()->getRememberToken()];
+                $token = $user->createToken($req->device_name)->plainTextToken;
+                return ['token' => $token];
             } else {
                 $this->badRequest([
                     'errors' => [
