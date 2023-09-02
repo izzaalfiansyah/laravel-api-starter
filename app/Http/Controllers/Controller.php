@@ -18,7 +18,9 @@ class Controller extends BaseController
         $validator = Validator::make($data, $schema);
 
         if ($validator->fails()) {
-            $this->badRequest($validator->errors());
+            $this->badRequest([
+                'errors' => $validator->errors()
+            ]);
         }
 
         return $validator->validated();
