@@ -34,6 +34,13 @@ class UserController extends Controller
         return $items;
     }
 
+    function show($id)
+    {
+        $item = User::find($id);
+
+        return $item;
+    }
+
     public function store(Request $req)
     {
         $data = $this->schema($req->all(), $this->rules());
