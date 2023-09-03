@@ -19,7 +19,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [Controllers\AuthController::class, 'profile']);
     Route::get('/logout', [Controllers\AuthController::class, 'logout']);
 
-    Route::middleware(['ability:*'])->group(function () {
+    Route::middleware('verified')->group(function () {
         Route::resource('/user', Controllers\UserController::class);
     });
 });

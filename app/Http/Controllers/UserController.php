@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -45,7 +46,13 @@ class UserController extends Controller
 
         $item = User::create($data);
 
-        return $item;
+        $item->sendEmailVerificationNotification();
+        $token = $item->createToken($req->device_name)->plainTextToken;
+
+        return [
+            'message' => 'user successfully registered',
+            'token' => $token,
+        ];
     }
 
     public function update(Request $req, $id)
@@ -60,7 +67,9 @@ class UserController extends Controller
 
         $item?->update($data);
 
-        return $item;
+        return [
+            'message' => 'user successfully updated',
+        ];
     }
 
     public function destroy($id)
@@ -69,7 +78,9 @@ class UserController extends Controller
 
         $item?->delete();
 
-        return $item;
+        return [
+            'message' => 'user successfully deleted',
+        ];
     }
 
     public function rules($id = null)
