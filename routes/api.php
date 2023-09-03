@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/login', [Controllers\AuthController::class, 'login']);
+Route::post('/register', [Controllers\AuthController::class, 'register']);
 Route::post('/forgot-password', [Controllers\AuthController::class, 'sendForgotPasswordEmail']);
 Route::post('/reset-password', [Controllers\AuthController::class, 'resetPasswordEmail']);
 Route::get('/verify/{id}/{hash}', [Controllers\AuthController::class, 'verify']);

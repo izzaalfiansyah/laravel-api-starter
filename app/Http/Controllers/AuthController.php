@@ -45,6 +45,22 @@ class AuthController extends Controller
         }
     }
 
+    public function register(Request $req)
+    {
+        $data = $this->schema($req->all(), [
+            'email' => 'required|email|max:255|unique:users',
+            'nama' => 'required|max:255',
+            'password' => 'required|min:8|confirmed',
+            'device_name' => 'required'
+        ]);
+
+        $user = User::create($data);
+
+        $token = $user->createToken($req->device_name, $user->role != '1' ? ['access-public'] : ['*'])->plainTextToken;
+
+        return ['token' => $token];
+    }
+
     public function sendVerificationEmail(Request $req)
     {
         $user = User::find($req->user()->id);
