@@ -7,11 +7,9 @@ use App\Mail\VerifyAccount;
 use App\Models\PasswordResetToken;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Password;
 
 class AuthController extends Controller
 {
@@ -27,7 +25,7 @@ class AuthController extends Controller
 
         if ($user) {
             if (Hash::check($req->password, $user->password)) {
-                $token = $user->createToken($req->device_name, $user->role != '1' ? ['access-public'] : ['*'])->plainTextToken;
+                $token = $user->createToken($req->device_name)->plainTextToken;
                 return ['token' => $token];
             } else {
                 $this->badRequest([
@@ -56,7 +54,7 @@ class AuthController extends Controller
 
         $user = User::create($data);
 
-        $token = $user->createToken($req->device_name, $user->role != '1' ? ['access-public'] : ['*'])->plainTextToken;
+        $token = $user->createToken($req->device_name)->plainTextToken;
 
         return ['token' => $token];
     }
