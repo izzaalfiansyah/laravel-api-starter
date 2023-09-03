@@ -2,7 +2,6 @@
 
 namespace App\Mail;
 
-use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -10,16 +9,15 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class VerifyAccount extends Mailable
+class GetCodeForResetPassword extends Mailable
 {
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(
-        public User $user
-    ) {
+    public function __construct()
+    {
         //
     }
 
@@ -29,7 +27,7 @@ class VerifyAccount extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Verify Account',
+            subject: 'Reset Password',
         );
     }
 
@@ -39,10 +37,7 @@ class VerifyAccount extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'mails.verify-account',
-            with: [
-                'verify_link' => url('/api/verify/' . $this->user->id . '/' . sha1($this->user->email))
-            ]
+            markdown: 'mails.get-code-for-reset-password',
         );
     }
 

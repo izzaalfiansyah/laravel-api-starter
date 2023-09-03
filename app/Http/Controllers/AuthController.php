@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\GetCodeForResetPassword;
 use App\Mail\VerifyAccount;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -76,16 +77,18 @@ class AuthController extends Controller
             'email' => 'required',
         ]);
 
-        $status = Password::sendResetLink($req->only('email'));
+        $user = User::where('email', $req->email)->first();
 
-        if ($status == Password::RESET_LINK_SENT) {
+        if ($user) {
+            Mail::to($user->email)->send(new GetCodeForResetPassword());
+
             return [
-                'message' => 'reset password link sent'
+                'message' => 'reset password code sent'
             ];
         } else {
             $this->badRequest([
                 'errors' => [
-                    'message' => ['reset password link failed to send']
+                    'message' => ['reset password code failed to send']
                 ]
             ]);
         }
