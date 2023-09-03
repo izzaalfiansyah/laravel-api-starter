@@ -15,13 +15,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::post('/login', [Controllers\AuthController::class, 'login']);
+Route::get('/verify/{id}/{hash}', [Controllers\AuthController::class, 'verify'])->name('verification.verify')->middleware('signed');
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [Controllers\AuthController::class, 'profile']);
     Route::get('/logout', [Controllers\AuthController::class, 'logout']);
+    Route::get('/verify', [Controllers\AuthController::class, 'sendVerificationEmail']);
 
     Route::middleware('verified')->group(function () {
         Route::resource('/user', Controllers\UserController::class);
     });
 });
-
-Route::post('/login', [Controllers\AuthController::class, 'login']);

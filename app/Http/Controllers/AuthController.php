@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -38,7 +40,29 @@ class AuthController extends Controller
         }
     }
 
-    function logout(Request $req)
+    public function sendVerificationEmail(Request $req)
+    {
+        $req->user()->sendEmailVerificationNotification();
+
+        return [
+            'message' => 'verification link sent',
+        ];
+    }
+
+    public function verify(Request $req)
+    {
+        $user = User::find($req->route('id'));
+
+        if (!$req->route('hash') == sha1($user->email)) {
+            throw new AuthorizationException;
+        }
+
+        $user->markEmailAsVerified();
+
+        return redirect()->away('app://open');
+    }
+
+    public function logout(Request $req)
     {
         $req->user()->currentAccessToken()->delete();
 
