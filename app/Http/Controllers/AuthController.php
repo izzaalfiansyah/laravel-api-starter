@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\GetCodeForResetPassword;
 use App\Mail\VerifyAccount;
+use App\Models\PasswordResetToken;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
@@ -80,7 +81,14 @@ class AuthController extends Controller
         $user = User::where('email', $req->email)->first();
 
         if ($user) {
-            Mail::to($user->email)->send(new GetCodeForResetPassword());
+            PasswordResetToken::where('email', $user->email)->delete();
+
+            $passwordResetToken = PasswordResetToken::create([
+                'email' => $user->email,
+                'token' => random_int(000000, 999999),
+            ]);
+
+            Mail::to($user->email)->send(new GetCodeForResetPassword($passwordResetToken));
 
             return [
                 'message' => 'reset password code sent'
