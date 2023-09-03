@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\VerifyAccount;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
 
 class AuthController extends Controller
 {
@@ -42,7 +44,9 @@ class AuthController extends Controller
 
     public function sendVerificationEmail(Request $req)
     {
-        $req->user()->sendEmailVerificationNotification();
+        $user = User::find($req->user()->id);
+
+        Mail::to($user->email)->send(new VerifyAccount($user));
 
         return [
             'message' => 'verification link sent',
@@ -53,13 +57,38 @@ class AuthController extends Controller
     {
         $user = User::find($req->route('id'));
 
-        if (!$req->route('hash') == sha1($user->email)) {
+        if ($req->route('hash') != sha1($user->email)) {
             throw new AuthorizationException;
         }
 
         $user->markEmailAsVerified();
 
-        return redirect()->away('app://open');
+        return '
+            <script>
+                window.close();
+            </script>
+        ';
+    }
+
+    function sendForgotPasswordEmail(Request $req)
+    {
+        $this->schema($req->all(), [
+            'email' => 'required',
+        ]);
+
+        $status = Password::sendResetLink($req->only('email'));
+
+        if ($status == Password::RESET_LINK_SENT) {
+            return [
+                'message' => 'reset password link sent'
+            ];
+        } else {
+            $this->badRequest([
+                'errors' => [
+                    'message' => ['reset password link failed to send']
+                ]
+            ]);
+        }
     }
 
     public function logout(Request $req)

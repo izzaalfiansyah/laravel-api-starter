@@ -46,12 +46,8 @@ class UserController extends Controller
 
         $item = User::create($data);
 
-        $item->sendEmailVerificationNotification();
-        $token = $item->createToken($req->device_name)->plainTextToken;
-
         return [
-            'message' => 'user successfully registered',
-            'token' => $token,
+            'message' => 'user successfully created',
         ];
     }
 

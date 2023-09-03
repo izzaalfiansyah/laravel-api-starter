@@ -16,7 +16,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/login', [Controllers\AuthController::class, 'login']);
-Route::get('/verify/{id}/{hash}', [Controllers\AuthController::class, 'verify'])->name('verification.verify')->middleware('signed');
+Route::post('/forgot-password', [Controllers\AuthController::class, 'sendForgotPasswordEmail']);
+Route::get('/verify/{id}/{hash}', [Controllers\AuthController::class, 'verify']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [Controllers\AuthController::class, 'profile']);
