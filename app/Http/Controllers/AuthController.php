@@ -7,6 +7,7 @@ use App\Mail\VerifyAccount;
 use App\Models\PasswordResetToken;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -17,7 +18,7 @@ class AuthController extends Controller
     public function login(Request $req)
     {
         $data = $this->schema($req->all(), [
-            'email' => 'required',
+            'email' => 'required|email',
             'password' => 'required',
             'device_name' => 'required',
         ]);
@@ -72,10 +73,10 @@ class AuthController extends Controller
         ';
     }
 
-    function sendForgotPasswordEmail(Request $req)
+    public function sendForgotPasswordEmail(Request $req)
     {
         $this->schema($req->all(), [
-            'email' => 'required',
+            'email' => 'required|email',
         ]);
 
         $user = User::where('email', $req->email)->first();
@@ -96,10 +97,65 @@ class AuthController extends Controller
         } else {
             $this->badRequest([
                 'errors' => [
-                    'message' => ['reset password code failed to send']
+                    'message' => ['reset password code failed to send'],
+                ],
+            ]);
+        }
+    }
+
+    public function resetPasswordEmail(Request $req)
+    {
+        $this->schema($req->all(), [
+            'email' => 'required|email',
+            'password' => 'required|min:8|confirmed',
+            'token' => 'required',
+        ]);
+
+        $user = User::where('email', $req->email)->first();
+
+        if (!$user) {
+            $this->badRequest([
+                'errors' => [
+                    'message' => ['you can\'t reset your password'],
+                ],
+            ]);
+        }
+
+        $passwordResetToken = PasswordResetToken::where('email', $req->email)->first();
+
+        if (!$passwordResetToken) {
+            $this->badRequest([
+                'errors' => [
+                    'message' => ['resetting password failed']
+                ],
+            ]);
+        }
+
+        if ($passwordResetToken->token != $req->token) {
+            $this->badRequest([
+                'errors' => [
+                    'message' => ['your token mismatch'],
                 ]
             ]);
         }
+
+        if (date('Y-m-d H:i:s', strtotime('+1 hours', strtotime($passwordResetToken->created_at))) < date('Y-m-d H:i:s')) {
+            $this->badRequest([
+                'errors' => [
+                    'message' => ['your token has expired'],
+                ],
+            ]);
+        }
+
+        $user->update([
+            'password' => $req->password
+        ]);
+
+        PasswordResetToken::where('email', $req->email)->delete();
+
+        return [
+            'message' => 'password successfully changed',
+        ];
     }
 
     public function logout(Request $req)
