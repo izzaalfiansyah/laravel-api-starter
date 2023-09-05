@@ -185,4 +185,30 @@ class AuthController extends Controller
     {
         return $req->user();
     }
+
+    public function changePassword(Request $req)
+    {
+        $this->schema($req->all(), [
+            'old_password' => 'required',
+            'password' => 'required|confirmed|min:8'
+        ]);
+
+        $user = User::find($req->user()->id);
+
+        if (!Hash::check($req->old_password, $user->password)) {
+            $this->badRequest([
+                'errors' => [
+                    'old_password' => 'old password incorrect',
+                ]
+            ]);
+        }
+
+        $user->update([
+            'password' => $req->password
+        ]);
+
+        return [
+            'message' => 'password successfully changed',
+        ];
+    }
 }

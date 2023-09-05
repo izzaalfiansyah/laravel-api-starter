@@ -23,6 +23,7 @@ Route::get('/verify/{id}/{hash}', [Controllers\AuthController::class, 'verify'])
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [Controllers\AuthController::class, 'profile']);
+    Route::post('/change-password', [Controllers\AuthController::class, 'changePassword']);
     Route::get('/logout', [Controllers\AuthController::class, 'logout']);
     Route::get('/verify', [Controllers\AuthController::class, 'sendVerificationEmail']);
 
