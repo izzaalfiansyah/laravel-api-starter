@@ -110,9 +110,7 @@ class AuthController extends Controller
             ];
         } else {
             $this->badRequest([
-                'errors' => [
-                    'message' => ['reset password code failed to send'],
-                ],
+                'message' => 'reset password code failed to send'
             ]);
         }
     }
@@ -129,9 +127,7 @@ class AuthController extends Controller
 
         if (!$user) {
             $this->badRequest([
-                'errors' => [
-                    'message' => ['you can\'t reset your password'],
-                ],
+                'message' => 'you can\'t reset your password'
             ]);
         }
 
@@ -139,25 +135,19 @@ class AuthController extends Controller
 
         if (!$passwordResetToken) {
             $this->badRequest([
-                'errors' => [
-                    'message' => ['resetting password failed']
-                ],
+                'message' => 'resetting password failed'
             ]);
         }
 
         if ($passwordResetToken->token != $req->token) {
             $this->badRequest([
-                'errors' => [
-                    'message' => ['your token mismatch'],
-                ]
+                'message' => 'your token mismatch'
             ]);
         }
 
         if (date('Y-m-d H:i:s', strtotime('+1 hours', strtotime($passwordResetToken->created_at))) < date('Y-m-d H:i:s')) {
             $this->badRequest([
-                'errors' => [
-                    'message' => ['your token has expired'],
-                ],
+                'message' => 'your token has expired'
             ]);
         }
 
